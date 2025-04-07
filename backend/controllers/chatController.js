@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
 
+// Access or create one-to-one chat
 const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
 
@@ -22,7 +23,7 @@ const accessChat = asyncHandler(async (req, res) => {
 
   isChat = await User.populate(isChat, {
     path: "latestMessage.sender",
-    select: "name pic email",
+    select: "name email",
   });
 
   if (isChat.length > 0) {
@@ -48,6 +49,7 @@ const accessChat = asyncHandler(async (req, res) => {
   }
 });
 
+// Fetch all chats
 const fetchChats = asyncHandler(async (req, res) => {
   try {
     Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
@@ -58,7 +60,7 @@ const fetchChats = asyncHandler(async (req, res) => {
       .then(async (results) => {
         results = await User.populate(results, {
           path: "latestMessage.sender",
-          select: "name pic email",
+          select: "name email",
         });
         res.status(200).send(results);
       });

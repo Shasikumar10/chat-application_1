@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import ChatList from "../components/ChatList";
-import ChatBox from "../components/ChatBox";
+// src/pages/ChatPage.jsx
+import React from 'react';
+import SideDrawer from '../components/SideDrawer';
+import MyChats from '../components/MyChats';
+import ChatBox from '../components/ChatBox';
+import './ChatPage.css'; // Optional: for layout
 
-const ChatPage = ({ user }) => {
-  const [selectedChat, setSelectedChat] = useState(null);
-
+const ChatPage = () => {
   return (
-    <div style={{ display: "flex" }}>
-      <ChatList
-        user={user}
-        selectedChat={selectedChat}
-        setSelectedChat={setSelectedChat}
-      />
-      <ChatBox selectedChat={selectedChat} user={user} />
+    <div className="chatPage">
+      <SideDrawer />
+      <div className="chatContainer">
+        <MyChats />
+        <ChatBox />
+      </div>
     </div>
   );
 };

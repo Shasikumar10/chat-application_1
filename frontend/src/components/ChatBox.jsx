@@ -1,61 +1,48 @@
-// src/components/ChatBox.jsx
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import "./ChatBox.css";
+import React, { useState, useEffect } from "react";
+import socket from "../socket";
 
-const ChatBox = ({ selectedChat, user }) => {
+const ChatBox = ({ user }) => {
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
 
-  const fetchMessages = async () => {
-    if (!selectedChat) return;
-
-    try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.get(
-        `http://localhost:5000/api/message/${selectedChat._id}`,
-        config
-      );
-      setMessages(data);
-    } catch (error) {
-      console.log("Error fetching messages", error);
+  const sendMessage = () => {
+    if (message.trim()) {
+      const newMsg = { content: message, sender: user };
+      socket.emit("new message", newMsg);
+      setMessages((prev) => [...prev, newMsg]);
+      setMessage("");
     }
   };
 
   useEffect(() => {
-    fetchMessages();
-  }, [selectedChat]);
+    socket.on("message received", (newMsg) => {
+      setMessages((prev) => [...prev, newMsg]);
+    });
+
+    return () => {
+      socket.off("message received");
+    };
+  }, []);
 
   return (
-    <div className="chat-box">
-      {selectedChat ? (
-        <>
-          <h3 className="chat-title">
-            {selectedChat.isGroupChat
-              ? selectedChat.chatName
-              : selectedChat.users.find((u) => u._id !== user._id)?.name}
-          </h3>
-
-          <div className="messages-container">
-            {messages.map((msg) => (
-              <div
-                key={msg._id}
-                className={`message ${
-                  msg.sender._id === user._id ? "sent" : "received"
-                }`}
-              >
-                <span>{msg.sender.name}</span>
-                <p>{msg.content}</p>
-              </div>
-            ))}
+    <div>
+      <div className="chat-box border rounded p-3 mb-3" style={{ height: "300px", overflowY: "scroll" }}>
+        {messages.map((msg, index) => (
+          <div key={index} className={msg.sender._id === user._id ? "text-end" : "text-start"}>
+            <span className="badge bg-secondary">{msg.sender.name}:</span>
+            <p>{msg.content}</p>
           </div>
-        </>
-      ) : (
-        <div className="no-chat">Select a chat to start messaging</div>
-      )}
+        ))}
+      </div>
+      <div className="d-flex">
+        <input
+          className="form-control me-2"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type your message..."
+        />
+        <button className="btn btn-primary" onClick={sendMessage}>Send</button>
+      </div>
     </div>
   );
 };

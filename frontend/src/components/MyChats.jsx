@@ -1,20 +1,23 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect } from 'react';
+import axios from 'axios';
+import { ChatState } from '../context/ChatProvider';
 
-const MyChats = ({ selectedChat, setSelectedChat }) => {
-  const [chats, setChats] = useState([]);
+const MyChats = () => {
+  const { user, chats, setChats, selectedChat, setSelectedChat } = ChatState();
 
   const fetchChats = async () => {
-    const token = localStorage.getItem("token"); // Adjust to your storage logic
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-
-    const { data } = await axios.get("http://localhost:5000/api/chat", config);
-    setChats(data);
+      const { data } = await axios.get('/api/chat', config);
+      setChats(data);
+    } catch (error) {
+      console.error('Failed to load chats:', error);
+    }
   };
 
   useEffect(() => {
@@ -22,16 +25,22 @@ const MyChats = ({ selectedChat, setSelectedChat }) => {
   }, []);
 
   return (
-    <div className="card p-3">
-      <h5>My Chats</h5>
+    <div className="chat-list" style={{ padding: '10px', width: '35%', borderRight: '1px solid #ccc' }}>
+      <h3>My Chats</h3>
       {chats.map((chat) => (
         <div
           key={chat._id}
           onClick={() => setSelectedChat(chat)}
-          className={`chat-item p-2 my-2 border rounded ${selectedChat?._id === chat._id ? "bg-primary text-white" : ""}`}
-          style={{ cursor: "pointer" }}
+          style={{
+            padding: '8px',
+            margin: '5px 0',
+            background: selectedChat?._id === chat._id ? '#38B2AC' : '#E8E8E8',
+            color: selectedChat?._id === chat._id ? 'white' : 'black',
+            borderRadius: '5px',
+            cursor: 'pointer'
+          }}
         >
-          {chat.isGroupChat ? chat.chatName : chat.users.find((u) => u._id !== JSON.parse(localStorage.getItem("user"))._id).name}
+          {chat.isGroupChat ? chat.chatName : chat.users.find((u) => u._id !== user._id).name}
         </div>
       ))}
     </div>

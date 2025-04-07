@@ -1,13 +1,12 @@
-// src/components/SideDrawer.jsx
 import React from 'react';
+import { ChatState } from '../context/ChatProvider';
 
 const SideDrawer = () => {
-  const user = JSON.parse(localStorage.getItem('userInfo'));
+  const { user } = ChatState();
 
   return (
-    <div className="d-flex justify-content-between align-items-center p-3 bg-light border rounded">
-      <h4>Chat App</h4>
-      <span>Welcome, {user?.name}</span>
+    <div style={{ padding: '10px', background: '#eee', width: '250px' }}>
+      <h3>Welcome, {user?.name}</h3>
     </div>
   );
 };
