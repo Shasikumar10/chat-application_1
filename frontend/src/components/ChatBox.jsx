@@ -1,51 +1,61 @@
-import React, { useState, useEffect } from 'react';
-import socket from '../socket';
+// src/components/ChatBox.jsx
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./ChatBox.css";
 
-const ChatBox = () => {
-  const [message, setMessage] = useState('');
-  const [chatMessages, setChatMessages] = useState([]);
-  const chatId = "general"; // In real app, this should be dynamic
+const ChatBox = ({ selectedChat, user }) => {
+  const [messages, setMessages] = useState([]);
 
-  useEffect(() => {
-    socket.emit("join_chat", chatId);
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
 
-    socket.on("receive_message", (msg) => {
-      setChatMessages((prev) => [...prev, { sender: "other", text: msg }]);
-    });
-
-    return () => {
-      socket.off("receive_message");
-    };
-  }, []);
-
-  const sendMessage = () => {
-    if (!message.trim()) return;
-
-    socket.emit("send_message", { chatId, message });
-    setChatMessages((prev) => [...prev, { sender: "you", text: message }]);
-    setMessage('');
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const { data } = await axios.get(
+        `http://localhost:5000/api/message/${selectedChat._id}`,
+        config
+      );
+      setMessages(data);
+    } catch (error) {
+      console.log("Error fetching messages", error);
+    }
   };
 
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat]);
+
   return (
-    <div className="card p-3">
-      <h5>Chat Window</h5>
-      <div className="chat-messages mb-3" style={{ height: '300px', overflowY: 'auto' }}>
-        {chatMessages.map((msg, idx) => (
-          <div key={idx} className="mb-2">
-            <strong>{msg.sender}:</strong> {msg.text}
+    <div className="chat-box">
+      {selectedChat ? (
+        <>
+          <h3 className="chat-title">
+            {selectedChat.isGroupChat
+              ? selectedChat.chatName
+              : selectedChat.users.find((u) => u._id !== user._id)?.name}
+          </h3>
+
+          <div className="messages-container">
+            {messages.map((msg) => (
+              <div
+                key={msg._id}
+                className={`message ${
+                  msg.sender._id === user._id ? "sent" : "received"
+                }`}
+              >
+                <span>{msg.sender.name}</span>
+                <p>{msg.content}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="d-flex">
-        <input
-          className="form-control me-2"
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type a message..."
-        />
-        <button className="btn btn-primary" onClick={sendMessage}>Send</button>
-      </div>
+        </>
+      ) : (
+        <div className="no-chat">Select a chat to start messaging</div>
+      )}
     </div>
   );
 };

@@ -9,9 +9,12 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use("/api/chat", require("./routes/chatRoutes"));
+const chatRoutes = require("./routes/chatRoutes");
+app.use("/api/chat", chatRoutes);
 
-// Your API routes here...
+// Setup API Routes
+app.use("/api/chat", require("./routes/chatRoutes"));
+// Your API routes here (if needed, e.g., user routes)
 // app.use("/api/user", require("./routes/userRoutes"));
 
 const server = http.createServer(app);
