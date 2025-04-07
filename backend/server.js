@@ -1,30 +1,49 @@
-// backend/server.js
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const connectDB = require("./config/db");
-const userRoutes = require("./routes/userRoutes");
+const http = require("http");
+const { Server } = require("socket.io");
 
 dotenv.config();
-connectDB();
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
+app.use("/api/chat", require("./routes/chatRoutes"));
 
-app.use("/api/user", userRoutes);
+// Your API routes here...
+// app.use("/api/user", require("./routes/userRoutes"));
 
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () =>
-  console.log(`Server running on port ${PORT}`)
-);
+const server = http.createServer(app);
 
-// Setup Socket.io
-const io = require("socket.io")(server, {
-  pingTimeout: 60000,
-  cors: { origin: "*" },
+// Setup Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: "*", // In production, specify frontend origin
+    methods: ["GET", "POST"],
+  },
 });
 
 io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
+  console.log("✅ User connected:", socket.id);
+
+  // Join Chat Room
+  socket.on("join_chat", (chatId) => {
+    socket.join(chatId);
+    console.log(`User joined chat: ${chatId}`);
+  });
+
+  // Listen for message
+  socket.on("send_message", (data) => {
+    const { chatId, message } = data;
+    console.log("📨 Message received:", message);
+    io.to(chatId).emit("receive_message", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("❌ User disconnected:", socket.id);
+  });
 });
+
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
