@@ -16,7 +16,7 @@ const messageRoutes = require("./routes/messageRoutes");
 
 // API Routes Setup
 app.use("/api/chat", chatRoutes);
-app.use("/api/message", messageRoutes);
+app.use("/api/message", messageRoutes); // This is the correct place for the line you mentioned
 
 // Create HTTP Server
 const server = http.createServer(app);
@@ -51,7 +51,6 @@ io.on("connection", (socket) => {
     const chat = newMessage.chat;
     if (!chat.users) return;
 
-    // Emit message to all users in the chat
     chat.users.forEach((user) => {
       if (user._id === newMessage.sender._id) return; // Skip sender
       socket.in(user._id).emit("message received", newMessage);

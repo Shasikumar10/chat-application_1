@@ -1,26 +1,19 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// src/context/ChatProvider.jsx
+import React, { createContext, useContext, useState } from 'react';
 
 const ChatContext = createContext();
 
-const ChatProvider = ({ children }) => {
-  const [user, setUser] = useState();
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [chats, setChats] = useState([]);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    setUser(userInfo);
-  }, []);
+  const login = (userData) => setUser(userData);
+  const logout = () => setUser(null);
 
   return (
-    <ChatContext.Provider
-      value={{ user, setUser, selectedChat, setSelectedChat, chats, setChats }}
-    >
+    <ChatContext.Provider value={{ user, login, logout }}>
       {children}
     </ChatContext.Provider>
   );
 };
 
-export const ChatState = () => useContext(ChatContext);
-
-export default ChatProvider;
+export const useAuth = () => useContext(ChatContext);

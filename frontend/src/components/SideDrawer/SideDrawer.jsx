@@ -1,8 +1,8 @@
 import React from 'react';
-import { ChatState } from '../context/ChatProvider';
+import { useAuth } from '../../context/ChatProvider';
 
 const SideDrawer = () => {
-  const { user } = ChatState();
+  const { user } = useAuth();
 
   return (
     <div style={{ padding: '10px', background: '#eee', width: '250px' }}>

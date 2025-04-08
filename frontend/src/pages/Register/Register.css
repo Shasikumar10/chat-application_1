@@ -1,0 +1,50 @@
+/* Same styles as Login.css for consistency */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f6fa;
+  }
+  
+  .auth-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 350px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .auth-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .auth-box input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .auth-box button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4a69bd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .auth-box button:hover {
+    background-color: #3b58a3;
+  }
+  
+  .auth-box .link {
+    color: #4a69bd;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
