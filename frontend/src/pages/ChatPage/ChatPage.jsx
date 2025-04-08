@@ -1,11 +1,12 @@
-// src/pages/ChatPage/ChatPage.jsx
 import React from 'react';
+import SideDrawer from '../../components/SideDrawer/SideDrawer';
+import ChatBox from '../../components/ChatBox/ChatBox';
 
 const ChatPage = () => {
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Welcome to the Chat Page</h1>
-      <p>You are now logged in.</p>
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <SideDrawer />
+      <ChatBox />
     </div>
   );
 };
